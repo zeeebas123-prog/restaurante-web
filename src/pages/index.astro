@@ -3,6 +3,10 @@ import "../styles/global.css";
 import Header from "../components/Header.astro";
 import Hero from "../components/Hero.astro";
 import Footer from "../components/Footer.astro";
+import { getCollection } from "astro:content";
+
+const platos = await getCollection("menu");
+const categorias = [...new Set(platos.map((p) => p.data.categoria))];
 ---
 
 <html lang="es">
@@ -17,6 +21,32 @@ import Footer from "../components/Footer.astro";
 	<body class="bg-black text-white">
 		<Header />
 		<Hero />
+
+		<section id="menu" class="max-w-3xl mx-auto py-16 px-6">
+			{categorias.map((categoria) => (
+				<div class="mb-12">
+					<h2 class="text-red-600 text-2xl font-serif italic mb-6 border-b border-red-600 pb-2">
+						{categoria}
+					</h2>
+					<div class="space-y-4">
+						{platos
+							.filter((p) => p.data.categoria === categoria)
+							.map((plato) => (
+								<div class="flex justify-between gap-4 border-b border-gray-800 pb-3">
+									<div>
+										<h3 class="text-lg font-bold">{plato.data.nombre}</h3>
+										{plato.data.descripcion && (
+											<p class="text-gray-400 text-sm">{plato.data.descripcion}</p>
+										)}
+									</div>
+									<span class="text-red-500 font-bold whitespace-nowrap">${plato.data.precio.toFixed(2)}</span>
+								</div>
+							))}
+					</div>
+				</div>
+			))}
+		</section>
+
 		<Footer />
 	</body>
 </html>
