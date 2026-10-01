@@ -28,35 +28,58 @@ const imagenesCategoria: Record<string, string> = {
 		<Hero />
 
 		<section id="menu" class="max-w-3xl mx-auto py-16 px-6">
-			{categorias.map((categoria) => (
-				<div class="mb-12">
-					{imagenesCategoria[categoria] && (
-						<img
-							src={imagenesCategoria[categoria]}
-							alt={categoria}
-							class="w-full h-48 object-cover rounded mb-6"
-						/>
-					)}
-					<h2 class="text-red-600 text-2xl font-serif italic mb-6 border-b border-red-600 pb-2">
-						{categoria}
-					</h2>
-					<div class="space-y-4">
-						{platos
-							.filter((p) => p.data.categoria === categoria)
-							.map((plato) => (
-								<div class="flex justify-between gap-4 border-b border-gray-800 pb-3">
-									<div>
-										<h3 class="text-lg font-bold">{plato.data.nombre}</h3>
-										{plato.data.descripcion && (
-											<p class="text-gray-400 text-sm">{plato.data.descripcion}</p>
-										)}
-									</div>
-									<span class="text-red-500 font-bold whitespace-nowrap">${plato.data.precio.toFixed(2)}</span>
-								</div>
-							))}
-					</div>
+			<div x-data="{ activa: 'Todo' }">
+
+				<div class="flex gap-2 overflow-x-auto pb-6 mb-6">
+					<button
+						@click="activa = 'Todo'"
+						:class="activa === 'Todo' ? 'bg-red-600' : 'bg-gray-800'"
+						class="px-4 py-2 rounded-full whitespace-nowrap text-sm font-bold"
+					>
+						Todo
+					</button>
+					{categorias.map((categoria) => (
+						<button
+							@click={`activa = '${categoria}'`}
+							:class={`activa === '${categoria}' ? 'bg-red-600' : 'bg-gray-800'`}
+							class="px-4 py-2 rounded-full whitespace-nowrap text-sm font-bold"
+						>
+							{categoria}
+						</button>
+					))}
 				</div>
-			))}
+
+				{categorias.map((categoria) => (
+					<div class="mb-12" x-show={`activa === 'Todo' || activa === '${categoria}'`}>
+						{imagenesCategoria[categoria] && (
+							<img
+								src={imagenesCategoria[categoria]}
+								alt={categoria}
+								class="w-full h-48 object-cover rounded mb-6"
+							/>
+						)}
+						<h2 class="text-red-600 text-2xl font-serif italic mb-6 border-b border-red-600 pb-2">
+							{categoria}
+						</h2>
+						<div class="space-y-4">
+							{platos
+								.filter((p) => p.data.categoria === categoria)
+								.map((plato) => (
+									<div class="flex justify-between gap-4 border-b border-gray-800 pb-3">
+										<div>
+											<h3 class="text-lg font-bold">{plato.data.nombre}</h3>
+											{plato.data.descripcion && (
+												<p class="text-gray-400 text-sm">{plato.data.descripcion}</p>
+											)}
+										</div>
+										<span class="text-red-500 font-bold whitespace-nowrap">${plato.data.precio.toFixed(2)}</span>
+									</div>
+								))}
+						</div>
+					</div>
+				))}
+
+			</div>
 		</section>
 
 		<Footer />
