@@ -50,7 +50,7 @@ const imagenesCategoria: Record<string, string> = {
 				</div>
 
 				{categorias.map((categoria) => (
-					<div class="mb-12" x-show={`activa === 'Todo' || activa === '${categoria}'`}>
+					<div class="mb-12" x-transition x-show={`activa === 'Todo' || activa === '${categoria}'`}>
 						{imagenesCategoria[categoria] && (
 							<img
 								src={imagenesCategoria[categoria]}
