@@ -14,6 +14,49 @@ const imagenesCategoria: Record<string, string> = {
 	"Platos Fuertes": "/images/foto-parrillada.jpg",
 };
 
+// ---------- SEO ----------
+// Cuando tengas dominio propio, cambia solo esta línea
+const sitio = "https://restaurante-web-eight.vercel.app";
+const titulo = "Casona Betsabé Restaurante | Menú y sabores de Imbabura";
+const descripcion =
+	"Conoce el menú de Casona Betsabé: desayunos, almuerzos, asados de borrego, trucha, fritada y postres tradicionales de Imbabura.";
+const imagenSocial = `${sitio}/images/foto-parrillada.jpg`;
+
+const datosEstructurados = {
+	"@context": "https://schema.org",
+	"@type": "Restaurant",
+	name: "Casona Betsabé Restaurante",
+	url: sitio,
+	image: imagenSocial,
+	description: descripcion,
+	telephone: "+593961999300",
+	servesCuisine: "Ecuatoriana",
+	hasMenu: `${sitio}/#menu`,
+	hasMap: "https://maps.app.goo.gl/hfxUxnuoh812vGax6",
+	geo: {
+		"@type": "GeoCoordinates",
+		latitude: 0.1495276,
+		longitude: -78.186543,
+	},
+	openingHoursSpecification: [
+		{
+			"@type": "OpeningHoursSpecification",
+			dayOfWeek: [
+				"Monday",
+				"Tuesday",
+				"Wednesday",
+				"Thursday",
+				"Friday",
+				"Saturday",
+				"Sunday",
+			],
+			opens: "07:30",
+			closes: "18:00",
+		},
+	],
+};
+// -------------------------
+
 // Quita tildes y pasa a minúsculas para que "montanes" encuentre "Montañés"
 const normalizar = (t: string) =>
 	t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -49,8 +92,30 @@ const xdata = String.raw`{
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Casona Betsabé Restaurante</title>
-		<meta name="description" content="Casona Betsabé Restaurante - Sabores de Imbabura" />
+		<meta name="theme-color" content="#000000" />
+
+		<title>{titulo}</title>
+		<meta name="description" content={descripcion} />
+		<link rel="canonical" href={sitio + "/"} />
+
+		<!-- Vista previa al compartir (WhatsApp, Facebook, etc.) -->
+		<meta property="og:type" content="restaurant.restaurant" />
+		<meta property="og:site_name" content="Casona Betsabé" />
+		<meta property="og:locale" content="es_EC" />
+		<meta property="og:title" content={titulo} />
+		<meta property="og:description" content={descripcion} />
+		<meta property="og:url" content={sitio + "/"} />
+		<meta property="og:image" content={imagenSocial} />
+		<meta property="og:image:alt" content="Parrillada de la Casona Betsabé" />
+
+		<!-- Vista previa en X/Twitter -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={titulo} />
+		<meta name="twitter:description" content={descripcion} />
+		<meta name="twitter:image" content={imagenSocial} />
+
+		<!-- Datos estructurados para Google -->
+		<script type="application/ld+json" set:html={JSON.stringify(datosEstructurados)} />
 	</head>
 	<body class="bg-black text-white">
 		<Header />
@@ -105,6 +170,7 @@ const xdata = String.raw`{
 							<img
 								src={imagenesCategoria[categoria]}
 								alt={categoria}
+								loading="lazy"
 								class="w-full h-48 object-cover rounded mb-6"
 							/>
 						)}
@@ -137,6 +203,6 @@ const xdata = String.raw`{
 		</section>
 
 		<Footer />
-				<WhatsAppButton />
+		<WhatsAppButton />
 	</body>
 </html>

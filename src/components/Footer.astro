@@ -1,16 +1,38 @@
+---
+const mapsUrl = "https://maps.app.goo.gl/hfxUxnuoh812vGax6";
+const lat = 0.1495276;
+const lng = -78.186543;
+const embedUrl = `https://www.google.com/maps?q=${lat},${lng}&z=17&output=embed`;
+---
+
 <footer id="contacto" class="bg-black text-center py-12 px-6 border-t border-red-600">
 	<h3 class="text-white text-2xl font-serif italic mb-2">Casona Betsabé</h3>
 	<p class="text-gray-400 text-sm mb-6">Sabores de Imbabura</p>
 
 	<div class="text-gray-300 text-sm space-y-1 mb-6">
-		<p>📍 Otavalo</p>
+		<p>
+			📍
+			<a href={mapsUrl} target="_blank" rel="noopener noreferrer" class="underline hover:text-red-500">
+				Cómo llegar (Google Maps)
+			</a>
+		</p>
 		<p>
 			📞
 			<a href="tel:+593961999300" class="underline hover:text-red-500">096 199 9300</a>
 			·
 			<a href="tel:+593991239080" class="underline hover:text-red-500">099 123 9080</a>
 		</p>
-		<p>🕒 9:00 am </p>
+		<p>🕒 Lunes a domingo y feriados · 7:30 a 18:00</p>
+	</div>
+
+	<div class="max-w-3xl mx-auto mb-8">
+		<iframe
+			src={embedUrl}
+			title="Ubicación de Casona Betsabé en Google Maps"
+			loading="lazy"
+			referrerpolicy="no-referrer-when-downgrade"
+			class="w-full h-64 rounded border border-gray-800"
+		></iframe>
 	</div>
 
 	<p class="text-gray-500 text-xs">
