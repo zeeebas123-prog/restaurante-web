@@ -3,6 +3,7 @@ import "../styles/global.css";
 import Header from "../components/Header.astro";
 import Hero from "../components/Hero.astro";
 import Footer from "../components/Footer.astro";
+import WhatsAppButton from "../components/WhatsAppButton.astro";
 import { getCollection } from "astro:content";
 
 const platos = await getCollection("menu");
@@ -12,6 +13,34 @@ const imagenesCategoria: Record<string, string> = {
 	"Desayunos": "/images/foto-desayuno.jpg",
 	"Platos Fuertes": "/images/foto-parrillada.jpg",
 };
+
+// Quita tildes y pasa a minúsculas para que "montanes" encuentre "Montañés"
+const normalizar = (t: string) =>
+	t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+// Texto buscable de cada categoría (nombres + descripciones de sus platos)
+const mapa: Record<string, string> = {};
+for (const categoria of categorias) {
+	mapa[categoria] = platos
+		.filter((p) => p.data.categoria === categoria)
+		.map((p) => normalizar(`${p.data.nombre} ${p.data.descripcion ?? ""}`))
+		.join("|");
+}
+
+// Estado y funciones de Alpine
+const xdata = String.raw`{
+	activa: 'Todo',
+	busqueda: '',
+	mapa: ${JSON.stringify(mapa)},
+	q() {
+		return this.busqueda.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+	},
+	hay() {
+		return Object.entries(this.mapa).some(
+			([c, t]) => (this.activa === 'Todo' || this.activa === c) && t.includes(this.q())
+		);
+	}
+}`;
 ---
 
 <html lang="es">
@@ -28,7 +57,16 @@ const imagenesCategoria: Record<string, string> = {
 		<Hero />
 
 		<section id="menu" class="max-w-3xl mx-auto py-16 px-6">
-			<div x-data="{ activa: 'Todo' }">
+			<div x-data={xdata}>
+
+				<input
+					type="search"
+					x-model="busqueda"
+					placeholder="Buscar plato (ej. trucha, borrego, jugo)..."
+					aria-label="Buscar en el menú"
+					autocomplete="off"
+					class="w-full mb-4 px-5 py-3 rounded-full bg-gray-900 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-red-600"
+				/>
 
 				<div class="flex gap-2 overflow-x-auto pb-6 mb-6">
 					<button
@@ -49,8 +87,20 @@ const imagenesCategoria: Record<string, string> = {
 					))}
 				</div>
 
+				<p
+					x-show="!hay()"
+					style="display: none;"
+					class="text-center text-gray-400 py-12"
+				>
+					No encontramos platos con "<span x-text="busqueda"></span>". Prueba con otra palabra.
+				</p>
+
 				{categorias.map((categoria) => (
-					<div class="mb-12" x-transition x-show={`activa === 'Todo' || activa === '${categoria}'`}>
+					<div
+						class="mb-12"
+						x-transition
+						x-show={`(activa === 'Todo' || activa === '${categoria}') && mapa['${categoria}'].includes(q())`}
+					>
 						{imagenesCategoria[categoria] && (
 							<img
 								src={imagenesCategoria[categoria]}
@@ -65,7 +115,11 @@ const imagenesCategoria: Record<string, string> = {
 							{platos
 								.filter((p) => p.data.categoria === categoria)
 								.map((plato) => (
-									<div class="flex justify-between gap-4 border-b border-gray-800 pb-3">
+									<div
+										class="flex justify-between gap-4 border-b border-gray-800 pb-3"
+										data-texto={normalizar(`${plato.data.nombre} ${plato.data.descripcion ?? ""}`)}
+										x-show="$el.dataset.texto.includes(q())"
+									>
 										<div>
 											<h3 class="text-lg font-bold">{plato.data.nombre}</h3>
 											{plato.data.descripcion && (
@@ -83,5 +137,6 @@ const imagenesCategoria: Record<string, string> = {
 		</section>
 
 		<Footer />
+				<WhatsAppButton />
 	</body>
 </html>
