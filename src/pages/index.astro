@@ -7,6 +7,7 @@ import WhatsAppButton from "../components/WhatsAppButton.astro";
 import { getCollection } from "astro:content";
 
 const platos = await getCollection("menu");
+const hayFotos = platos.some((p) => p.data.imagen);
 
 // Orden de las categorías (las que no estén aquí se agregan al final)
 const ordenCategorias = [
@@ -216,12 +217,28 @@ const xdata = String.raw`{
 								<div class="space-y-3">
 									{platosDe(categoria).map((plato) => (
 										<article
-											class="flex items-start justify-between gap-4 rounded-xl bg-superficie border border-borde p-4"
+											class="flex items-start gap-4 rounded-xl bg-superficie border border-borde p-4"
 											data-texto={normalizar(`${plato.data.nombre} ${plato.data.descripcion ?? ""}`)}
 											x-show="$el.dataset.texto.includes(q())"
 										>
-											<div class="min-w-0">
-												<h3 class="text-base sm:text-lg font-bold leading-snug">{plato.data.nombre}</h3>
+											{plato.data.imagen && (
+												<img
+													src={`/images/platos/${plato.data.imagen}`}
+													alt={plato.data.nombre}
+													width="96"
+													height="96"
+													loading="lazy"
+													onerror="this.style.display='none'"
+													class="h-20 w-20 sm:h-24 sm:w-24 shrink-0 rounded-lg object-cover"
+												/>
+											)}
+											<div class="min-w-0 flex-1">
+												<div class="flex items-start justify-between gap-3">
+													<h3 class="text-base sm:text-lg font-bold leading-snug">{plato.data.nombre}</h3>
+													<span class="shrink-0 rounded-md bg-marca px-2.5 py-1 text-sm font-bold italic text-texto whitespace-nowrap">
+														${plato.data.precio.toFixed(2)}
+													</span>
+												</div>
 												{plato.data.etiqueta && (
 													<span class="inline-block mt-1 text-xs uppercase tracking-wide text-marca-texto border border-marca/60 rounded-full px-2 py-0.5">
 														{plato.data.etiqueta}
@@ -231,9 +248,6 @@ const xdata = String.raw`{
 													<p class="mt-2 text-texto-tenue text-sm leading-relaxed">{plato.data.descripcion}</p>
 												)}
 											</div>
-											<span class="shrink-0 rounded-md bg-marca px-2.5 py-1 text-sm font-bold italic text-texto whitespace-nowrap">
-												${plato.data.precio.toFixed(2)}
-											</span>
 										</article>
 									))}
 								</div>
@@ -241,6 +255,10 @@ const xdata = String.raw`{
 						))}
 					</div>
 				))}
+
+				{hayFotos && (
+					<p class="text-center text-texto-tenue text-xs">Imágenes referenciales.</p>
+				)}
 
 			</div>
 		</section>

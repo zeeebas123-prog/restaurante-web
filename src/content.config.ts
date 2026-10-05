@@ -9,6 +9,7 @@ const menuCollection = defineCollection({
 		descripcion: z.string(),
 		categoria: z.string(),
 		etiqueta: z.string().optional(),
+		imagen: z.string().optional(),
 	}),
 });
 
