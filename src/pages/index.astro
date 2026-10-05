@@ -24,6 +24,21 @@ const categorias = [
 	...existentes.filter((c) => !ordenCategorias.includes(c)),
 ];
 
+// Los 4 accesos de la barra fija (cada uno agrupa categorías)
+const gruposBase = [
+	{ id: "desayunos", nombre: "Desayunos", categorias: ["Desayunos"] },
+	{ id: "platos", nombre: "Platos", categorias: ["Almuerzos", "Platos Fuertes", "Para Niños"] },
+	{ id: "postres", nombre: "Postres", categorias: ["Postres"] },
+	{ id: "bebidas", nombre: "Bebidas", categorias: ["Bebidas", "Licores"] },
+];
+const asignadas = gruposBase.flatMap((g) => g.categorias);
+const sueltas = categorias.filter((c) => !asignadas.includes(c));
+if (sueltas.length) gruposBase.push({ id: "otros", nombre: "Otros", categorias: sueltas });
+
+const grupos = gruposBase
+	.map((g) => ({ ...g, categorias: g.categorias.filter((c) => categorias.includes(c)) }))
+	.filter((g) => g.categorias.length > 0);
+
 // Platos de una categoría, del más económico al más caro
 const platosDe = (categoria: string) =>
 	platos
@@ -85,18 +100,27 @@ for (const categoria of categorias) {
 		.join("|");
 }
 
-// Estado y funciones de Alpine
+// Estado de Alpine: búsqueda + grupo visible mientras se desplaza la página
 const xdata = String.raw`{
-	activa: 'Todo',
 	busqueda: '',
+	grupo: '',
 	mapa: ${JSON.stringify(mapa)},
 	q() {
 		return this.busqueda.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 	},
 	hay() {
-		return Object.entries(this.mapa).some(
-			([c, t]) => (this.activa === 'Todo' || this.activa === c) && t.includes(this.q())
+		return Object.values(this.mapa).some((t) => t.includes(this.q()));
+	},
+	init() {
+		const obs = new IntersectionObserver(
+			(entradas) => {
+				entradas.forEach((e) => {
+					if (e.isIntersecting) this.grupo = e.target.dataset.grupo;
+				});
+			},
+			{ rootMargin: '-25% 0px -65% 0px' }
 		);
+		document.querySelectorAll('[data-grupo]').forEach((el) => obs.observe(el));
 	}
 }`;
 ---
@@ -135,11 +159,11 @@ const xdata = String.raw`{
 		<!-- Datos estructurados para Google -->
 		<script type="application/ld+json" set:html={JSON.stringify(datosEstructurados)} />
 	</head>
-	<body class="bg-black text-white">
+	<body class="bg-fondo text-texto">
 		<Header />
 		<Hero />
 
-		<section id="menu" class="max-w-3xl mx-auto py-16 px-6">
+		<section id="menu" class="max-w-3xl mx-auto pt-12 pb-16 px-6">
 			<div x-data={xdata}>
 
 				<input
@@ -148,62 +172,73 @@ const xdata = String.raw`{
 					placeholder="Buscar plato (ej. trucha, borrego, jugo)..."
 					aria-label="Buscar en el menú"
 					autocomplete="off"
-					class="w-full mb-4 px-5 py-3 rounded-full bg-gray-900 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-red-600"
+					class="w-full h-12 mb-4 px-5 rounded-full bg-superficie border border-borde text-texto text-base placeholder-texto-tenue focus:outline-none focus:border-marca"
 				/>
 
-				<div class="flex gap-2 overflow-x-auto pb-6 mb-6">
-					<button
-						@click="activa = 'Todo'"
-						:class="activa === 'Todo' ? 'bg-red-600' : 'bg-gray-800'"
-						class="px-4 py-2 rounded-full whitespace-nowrap text-sm font-bold"
-					>
-						Todo
-					</button>
-					{categorias.map((categoria) => (
-						<button
-							@click={`activa = '${categoria}'`}
-							:class={`activa === '${categoria}' ? 'bg-red-600' : 'bg-gray-800'`}
-							class="px-4 py-2 rounded-full whitespace-nowrap text-sm font-bold"
-						>
-							{categoria}
-						</button>
-					))}
-				</div>
+				<!-- Barra fija: queda pegada arriba mientras se recorre el menú -->
+				<nav
+					aria-label="Secciones del menú"
+					class="sticky top-0 z-40 -mx-6 px-6 py-3 mb-8 bg-fondo/95 backdrop-blur border-b border-borde"
+				>
+					<div class="grid gap-2" style={`grid-template-columns: repeat(${grupos.length}, minmax(0, 1fr));`}>
+						{grupos.map((g) => (
+							<a
+								href={`#${g.id}`}
+								:class={`grupo === '${g.id}' ? 'bg-marca text-texto border-marca' : 'bg-superficie text-texto-suave border-borde'`}
+								class="min-h-11 flex items-center justify-center rounded-full border text-xs sm:text-sm font-bold px-1 transition-colors"
+							>
+								{g.nombre}
+							</a>
+						))}
+					</div>
+				</nav>
 
 				<p
 					x-show="!hay()"
 					style="display: none;"
-					class="text-center text-gray-400 py-12"
+					class="text-center text-texto-tenue py-12"
 				>
 					No encontramos platos con "<span x-text="busqueda"></span>". Prueba con otra palabra.
 				</p>
 
-				{categorias.map((categoria) => (
+				{grupos.map((g) => (
 					<div
-						class="mb-12"
-						x-transition
-						x-show={`(activa === 'Todo' || activa === '${categoria}') && mapa['${categoria}'].includes(q())`}
+						id={g.id}
+						data-grupo={g.id}
+						class="scroll-mt-24"
+						x-show={`[${g.categorias.map((c) => `'${c}'`).join(",")}].some((c) => mapa[c].includes(q()))`}
 					>
-						<h2 class="text-red-600 text-2xl font-serif italic mb-6 border-b border-red-600 pb-2">
-							{categoria}
-						</h2>
-						<div class="space-y-4">
-							{platosDe(categoria).map((plato) => (
-								<div
-									class="flex justify-between gap-4 border-b border-gray-800 pb-3"
-									data-texto={normalizar(`${plato.data.nombre} ${plato.data.descripcion ?? ""}`)}
-									x-show="$el.dataset.texto.includes(q())"
-								>
-									<div>
-										<h3 class="text-lg font-bold">{plato.data.nombre}</h3>
-										{plato.data.descripcion && (
-											<p class="text-gray-400 text-sm">{plato.data.descripcion}</p>
-										)}
-									</div>
-									<span class="text-red-500 font-bold whitespace-nowrap">${plato.data.precio.toFixed(2)}</span>
+						{g.categorias.map((categoria) => (
+							<div class="mb-12" x-show={`mapa['${categoria}'].includes(q())`}>
+								<h2 class="text-marca-texto text-2xl font-serif italic mb-5 border-b border-marca pb-2">
+									{categoria}
+								</h2>
+								<div class="space-y-3">
+									{platosDe(categoria).map((plato) => (
+										<article
+											class="flex items-start justify-between gap-4 rounded-xl bg-superficie border border-borde p-4"
+											data-texto={normalizar(`${plato.data.nombre} ${plato.data.descripcion ?? ""}`)}
+											x-show="$el.dataset.texto.includes(q())"
+										>
+											<div class="min-w-0">
+												<h3 class="text-base sm:text-lg font-bold leading-snug">{plato.data.nombre}</h3>
+												{plato.data.etiqueta && (
+													<span class="inline-block mt-1 text-xs uppercase tracking-wide text-marca-texto border border-marca/60 rounded-full px-2 py-0.5">
+														{plato.data.etiqueta}
+													</span>
+												)}
+												{plato.data.descripcion && (
+													<p class="mt-2 text-texto-tenue text-sm leading-relaxed">{plato.data.descripcion}</p>
+												)}
+											</div>
+											<span class="shrink-0 rounded-md bg-marca px-2.5 py-1 text-sm font-bold italic text-texto whitespace-nowrap">
+												${plato.data.precio.toFixed(2)}
+											</span>
+										</article>
+									))}
 								</div>
-							))}
-						</div>
+							</div>
+						))}
 					</div>
 				))}
 

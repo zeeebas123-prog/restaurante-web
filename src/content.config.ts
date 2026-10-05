@@ -8,6 +8,7 @@ const menuCollection = defineCollection({
 		precio: z.number(),
 		descripcion: z.string(),
 		categoria: z.string(),
+		etiqueta: z.string().optional(),
 	}),
 });
 

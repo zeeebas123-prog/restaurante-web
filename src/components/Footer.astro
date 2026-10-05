@@ -5,22 +5,22 @@ const lng = -78.186543;
 const embedUrl = `https://www.google.com/maps?q=${lat},${lng}&z=17&output=embed`;
 ---
 
-<footer id="contacto" class="bg-black text-center py-12 px-6 border-t border-red-600">
-	<h3 class="text-white text-2xl font-serif italic mb-2">Casona Betsabé</h3>
-	<p class="text-gray-400 text-sm mb-6">Sabores de Imbabura</p>
+<footer id="contacto" class="bg-fondo text-center py-12 px-6 border-t border-marca scroll-mt-4">
+	<h3 class="text-texto text-2xl font-serif italic mb-2">Casona Betsabé</h3>
+	<p class="text-texto-tenue text-sm mb-6">Sabores de Imbabura</p>
 
-	<div class="text-gray-300 text-sm space-y-1 mb-6">
+	<div class="text-texto-suave text-sm space-y-2 mb-6">
 		<p>
 			📍
-			<a href={mapsUrl} target="_blank" rel="noopener noreferrer" class="underline hover:text-red-500">
+			<a href={mapsUrl} target="_blank" rel="noopener noreferrer" class="underline hover:text-marca-texto">
 				Cómo llegar (Google Maps)
 			</a>
 		</p>
-				<p>
+		<p>
 			📞
-			<a href="tel:+593961999300" class="underline hover:text-red-500">096 199 9300</a>
+			<a href="tel:+593961999300" class="underline hover:text-marca-texto">096 199 9300</a>
 			<span class="mx-2">·</span>
-			<a href="tel:+593991239080" class="underline hover:text-red-500">099 123 9080</a>
+			<a href="tel:+593991239080" class="underline hover:text-marca-texto">099 123 9080</a>
 		</p>
 		<p>🕒 Lunes a domingo y feriados · 7:30 a 18:00</p>
 	</div>
@@ -31,11 +31,11 @@ const embedUrl = `https://www.google.com/maps?q=${lat},${lng}&z=17&output=embed`
 			title="Ubicación de Casona Betsabé en Google Maps"
 			loading="lazy"
 			referrerpolicy="no-referrer-when-downgrade"
-			class="w-full h-64 rounded border border-gray-800"
+			class="w-full h-64 rounded border border-borde"
 		></iframe>
 	</div>
 
-	<p class="text-gray-500 text-xs">
+	<p class="text-texto-tenue text-xs">
 		© 2026 Casona Betsabé Restaurante. Todos los derechos reservados.
 	</p>
 </footer>
