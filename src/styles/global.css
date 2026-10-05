@@ -1,1 +1,16 @@
 @import "tailwindcss";
+
+/* Paleta de la marca: si cambia el diseño, se cambia solo aquí */
+@theme {
+	--color-marca: #e10b15;
+	--color-marca-oscuro: #b8090f;
+	--color-marca-texto: #ff4d54;
+
+	--color-fondo: #000000;
+	--color-superficie: #111111;
+	--color-borde: #2a2a2a;
+
+	--color-texto: #ffffff;
+	--color-texto-suave: #d1d5db;
+	--color-texto-tenue: #9ca3af;
+}
