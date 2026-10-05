@@ -7,12 +7,28 @@ import WhatsAppButton from "../components/WhatsAppButton.astro";
 import { getCollection } from "astro:content";
 
 const platos = await getCollection("menu");
-const categorias = [...new Set(platos.map((p) => p.data.categoria))];
 
-const imagenesCategoria: Record<string, string> = {
-	"Desayunos": "/images/foto-desayuno.jpg",
-	"Platos Fuertes": "/images/foto-parrillada.jpg",
-};
+// Orden de las categorías (las que no estén aquí se agregan al final)
+const ordenCategorias = [
+	"Desayunos",
+	"Almuerzos",
+	"Platos Fuertes",
+	"Para Niños",
+	"Postres",
+	"Bebidas",
+	"Licores",
+];
+const existentes = [...new Set(platos.map((p) => p.data.categoria))];
+const categorias = [
+	...ordenCategorias.filter((c) => existentes.includes(c)),
+	...existentes.filter((c) => !ordenCategorias.includes(c)),
+];
+
+// Platos de una categoría, del más económico al más caro
+const platosDe = (categoria: string) =>
+	platos
+		.filter((p) => p.data.categoria === categoria)
+		.sort((a, b) => a.data.precio - b.data.precio);
 
 // ---------- SEO ----------
 // Cuando tengas dominio propio, cambia solo esta línea
@@ -64,8 +80,7 @@ const normalizar = (t: string) =>
 // Texto buscable de cada categoría (nombres + descripciones de sus platos)
 const mapa: Record<string, string> = {};
 for (const categoria of categorias) {
-	mapa[categoria] = platos
-		.filter((p) => p.data.categoria === categoria)
+	mapa[categoria] = platosDe(categoria)
 		.map((p) => normalizar(`${p.data.nombre} ${p.data.descripcion ?? ""}`))
 		.join("|");
 }
@@ -93,6 +108,9 @@ const xdata = String.raw`{
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="theme-color" content="#000000" />
+
+		<!-- DEMO: oculta la página de Google. BORRAR esta línea cuando el cliente apruebe y se publique -->
+		<meta name="robots" content="noindex, nofollow" />
 
 		<title>{titulo}</title>
 		<meta name="description" content={descripcion} />
@@ -166,35 +184,25 @@ const xdata = String.raw`{
 						x-transition
 						x-show={`(activa === 'Todo' || activa === '${categoria}') && mapa['${categoria}'].includes(q())`}
 					>
-						{imagenesCategoria[categoria] && (
-							<img
-								src={imagenesCategoria[categoria]}
-								alt={categoria}
-								loading="lazy"
-								class="w-full h-48 object-cover rounded mb-6"
-							/>
-						)}
 						<h2 class="text-red-600 text-2xl font-serif italic mb-6 border-b border-red-600 pb-2">
 							{categoria}
 						</h2>
 						<div class="space-y-4">
-							{platos
-								.filter((p) => p.data.categoria === categoria)
-								.map((plato) => (
-									<div
-										class="flex justify-between gap-4 border-b border-gray-800 pb-3"
-										data-texto={normalizar(`${plato.data.nombre} ${plato.data.descripcion ?? ""}`)}
-										x-show="$el.dataset.texto.includes(q())"
-									>
-										<div>
-											<h3 class="text-lg font-bold">{plato.data.nombre}</h3>
-											{plato.data.descripcion && (
-												<p class="text-gray-400 text-sm">{plato.data.descripcion}</p>
-											)}
-										</div>
-										<span class="text-red-500 font-bold whitespace-nowrap">${plato.data.precio.toFixed(2)}</span>
+							{platosDe(categoria).map((plato) => (
+								<div
+									class="flex justify-between gap-4 border-b border-gray-800 pb-3"
+									data-texto={normalizar(`${plato.data.nombre} ${plato.data.descripcion ?? ""}`)}
+									x-show="$el.dataset.texto.includes(q())"
+								>
+									<div>
+										<h3 class="text-lg font-bold">{plato.data.nombre}</h3>
+										{plato.data.descripcion && (
+											<p class="text-gray-400 text-sm">{plato.data.descripcion}</p>
+										)}
 									</div>
-								))}
+									<span class="text-red-500 font-bold whitespace-nowrap">${plato.data.precio.toFixed(2)}</span>
+								</div>
+							))}
 						</div>
 					</div>
 				))}

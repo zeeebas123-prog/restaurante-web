@@ -1,12 +1,53 @@
-<section class="bg-black text-center py-24 px-6 border-b border-red-600">
+---
+// Horario en minutos desde medianoche: 7:30 = 450, 18:00 = 1080
+const apertura = 7 * 60 + 30;
+const cierre = 18 * 60;
+
+// "Abierto ahora" calculado con la hora de Ecuador
+const abiertoAhora = String.raw`{
+	listo: false,
+	abierto: false,
+	init() {
+		const hora = new Intl.DateTimeFormat('en-GB', {
+			timeZone: 'America/Guayaquil',
+			hour: '2-digit',
+			minute: '2-digit',
+			hourCycle: 'h23'
+		}).format(new Date());
+		const [h, m] = hora.split(':').map(Number);
+		const minutos = h * 60 + m;
+		this.abierto = minutos >= ${apertura} && minutos < ${cierre};
+		this.listo = true;
+	}
+}`;
+---
+
+<section class="bg-black text-center py-20 px-6 border-b border-red-600">
 	<p class="text-red-600 uppercase tracking-widest text-sm mb-4">Sabores de Imbabura</p>
+
+	<p
+		x-data={abiertoAhora}
+		x-show="listo"
+		style="display: none;"
+		class="inline-flex items-center gap-2 rounded-full border border-gray-700 bg-gray-900 px-4 py-2 text-sm text-gray-200 mb-6"
+	>
+		<span class="h-2.5 w-2.5 rounded-full" :class="abierto ? 'bg-green-500' : 'bg-red-500'"></span>
+		<span x-text="abierto ? 'Abierto ahora · cierra a las 18:00' : 'Cerrado ahora · abrimos a las 7:30'"></span>
+	</p>
+
 	<h2 class="text-white text-4xl md:text-6xl font-serif italic mb-6">
-		Para empezar bien el día
+		Desayunos, almuerzos y parrilladas de la sierra
 	</h2>
 	<p class="text-gray-300 max-w-xl mx-auto mb-8">
-		Desayunos tradicionales, parrilladas de borrego y sabores auténticos de la sierra ecuatoriana.
+		Platos tradicionales de Imbabura, de lunes a domingo y feriados.
 	</p>
-	<a href="#menu" class="inline-block bg-red-600 text-white px-8 py-3 uppercase tracking-wide text-sm hover:bg-red-700 transition">
-		Ver Menú
-	</a>
+
+	<div class="flex flex-wrap items-center justify-center gap-3">
+		<a href="#menu" class="inline-block bg-red-600 text-white px-8 py-3 uppercase tracking-wide text-sm hover:bg-red-700 transition">
+			Ver Menú
+		</a>
+		<a href="tel:+593961999300" class="inline-block border border-gray-600 text-white px-8 py-3 uppercase tracking-wide text-sm hover:border-red-600 hover:text-red-500 transition">
+			Llamar
+		</a>
+	</div>
 </section>
