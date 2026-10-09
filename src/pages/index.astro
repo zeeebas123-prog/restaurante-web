@@ -40,11 +40,15 @@ const grupos = gruposBase
 	.map((g) => ({ ...g, categorias: g.categorias.filter((c) => categorias.includes(c)) }))
 	.filter((g) => g.categorias.length > 0);
 
-// Platos de una categoría, del más económico al más caro
+// Platos de una categoría: primero los que tienen foto, luego del más económico al más caro
 const platosDe = (categoria: string) =>
 	platos
 		.filter((p) => p.data.categoria === categoria)
-		.sort((a, b) => a.data.precio - b.data.precio);
+		.sort(
+			(a, b) =>
+				Number(!a.data.imagen) - Number(!b.data.imagen) ||
+				a.data.precio - b.data.precio
+		);
 
 // ---------- SEO ----------
 // Cuando tengas dominio propio, cambia solo esta línea
