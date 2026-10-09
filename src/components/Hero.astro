@@ -1,4 +1,7 @@
 ---
+// Foto de fondo del Hero ("" para dejarlo en negro liso)
+const fondo = "/images/foto-parrillada.jpg";
+
 // Horario en minutos desde medianoche: 7:30 = 450, 18:00 = 1080
 const apertura = 7 * 60 + 30;
 const cierre = 18 * 60;
@@ -22,32 +25,40 @@ const abiertoAhora = String.raw`{
 }`;
 ---
 
-<section class="bg-fondo text-center py-20 px-6 border-b border-marca">
-	<p class="text-marca-texto uppercase tracking-widest text-sm mb-4">Sabores de Imbabura</p>
+<section
+	class="relative bg-fondo bg-cover bg-center border-b border-marca"
+	style={fondo ? `background-image: url('${fondo}');` : undefined}
+>
+	<div class="bg-black/75 text-center px-6 py-20 md:py-28">
+		<p class="font-script text-marca-texto text-4xl md:text-6xl mb-4">Sabores de Imbabura</p>
 
-	<p
-		x-data={abiertoAhora}
-		x-show="listo"
-		style="display: none;"
-		class="inline-flex items-center gap-2 rounded-full border border-borde bg-superficie px-4 py-2 text-sm text-texto-suave mb-6"
-	>
-		<span class="h-2.5 w-2.5 rounded-full" :class="abierto ? 'bg-green-500' : 'bg-red-500'"></span>
-		<span x-text="abierto ? 'Abierto ahora · cierra a las 18:00' : 'Cerrado ahora · abrimos a las 7:30'"></span>
-	</p>
+		<h2 class="font-display font-bold text-texto text-3xl md:text-5xl leading-tight max-w-2xl mx-auto mb-5">
+			Desayunos, almuerzos y parrilladas de la sierra
+		</h2>
 
-	<h2 class="text-texto text-4xl md:text-6xl font-serif italic mb-6">
-		Desayunos, almuerzos y parrilladas de la sierra
-	</h2>
-	<p class="text-texto-suave max-w-xl mx-auto mb-8">
-		Platos tradicionales de Imbabura, de lunes a domingo y feriados.
-	</p>
+		<div class="mx-auto mb-6 h-px w-16 bg-marca"></div>
 
-	<div class="flex flex-wrap items-center justify-center gap-3">
-		<a href="#menu" class="inline-block bg-marca text-texto px-8 py-3 uppercase tracking-wide text-sm hover:bg-marca-oscuro transition">
-			Ver Menú
-		</a>
-		<a href="tel:+593961999300" class="inline-block border border-borde text-texto px-8 py-3 uppercase tracking-wide text-sm hover:border-marca hover:text-marca-texto transition">
-			Llamar
-		</a>
+		<p
+			x-data={abiertoAhora}
+			x-show="listo"
+			style="display: none;"
+			class="inline-flex items-center gap-2 rounded-full border border-borde bg-superficie/90 px-4 py-2 text-sm text-texto-suave mb-6"
+		>
+			<span class="h-2.5 w-2.5 rounded-full" :class="abierto ? 'bg-green-500' : 'bg-red-500'"></span>
+			<span x-text="abierto ? 'Abierto ahora · cierra a las 18:00' : 'Cerrado ahora · abrimos a las 7:30'"></span>
+		</p>
+
+		<p class="text-texto-suave max-w-xl mx-auto mb-8">
+			Platos tradicionales de Imbabura, de lunes a domingo y feriados.
+		</p>
+
+		<div class="flex flex-wrap items-center justify-center gap-3">
+			<a href="#menu" class="inline-block bg-marca text-texto font-medium px-8 py-3 rounded-full uppercase tracking-wide text-sm hover:bg-marca-oscuro transition">
+				Ver menú
+			</a>
+			<a href="tel:+593961999300" class="inline-block border border-texto-tenue text-texto font-medium px-8 py-3 rounded-full uppercase tracking-wide text-sm hover:border-marca hover:text-marca-texto transition">
+				Llamar
+			</a>
+		</div>
 	</div>
 </section>
