@@ -1,7 +1,11 @@
 @import "tailwindcss";
 
-/* Paleta de la marca: si cambia el diseño, se cambia solo aquí */
+/* Tipografía y paleta de la marca: si cambia el diseño, se cambia solo aquí */
 @theme {
+	--font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+	--font-display: "Playfair Display", Georgia, serif;
+	--font-script: "Kaushan Script", cursive;
+
 	--color-marca: #e10b15;
 	--color-marca-oscuro: #b8090f;
 	--color-marca-texto: #ff4d54;
@@ -13,4 +17,10 @@
 	--color-texto: #ffffff;
 	--color-texto-suave: #d1d5db;
 	--color-texto-tenue: #9ca3af;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	html {
+		scroll-behavior: smooth;
+	}
 }
